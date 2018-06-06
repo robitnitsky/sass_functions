@@ -1,0 +1,93 @@
+// base styles
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 0 15px;
+}
+
+.color-boxes-list,
+.color-bullets-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+
+    li {
+        width: 25%;
+        flex-shrink: 0;
+    }
+}
+
+.color-bullets-list {
+    li {
+        width: 20px;
+        height: 20px;
+        margin: 0 5px 5px 0;
+        border-radius: 100%;
+    }
+}
+
+
+.color-box {
+    width: 100%;
+    height: 200px;
+}
+
+.stars-list {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: black;
+    width: 100%;
+    height: 500px;
+
+    li {
+        position: absolute;
+        background: white;
+    }
+}
+
+// task 1
+
+$colors: (
+   color1: red,
+   color2: green,
+   color3: blue,
+   color4: yellow
+);
+
+@each $key, $value in $colors {
+    .color-box.#{$key} {
+        background: $value;
+    }
+}
+
+// task 2
+
+@function randomColor() {
+    @return rgb(random(255), random(255), random(255));
+}
+
+@for $i from 1 through 100 {
+    .color-bullets-list {
+        li:nth-child(#{$i}) {
+            background: randomColor();
+        }
+    }
+}
+
+// task 3
+
+@for $i from 1 through 100 {
+    .stars-list {
+        li:nth-child(#{$i}) {
+            top: random(99) + %;
+            left: random(99) + %;
+            width: random(3) + px;
+            height: random(3) + px;
+        }
+    }
+}
