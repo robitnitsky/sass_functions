@@ -1,13 +1,27 @@
 // base styles
 
+html, 
+html * {
+    box-sizing: border-box;
+}
+
 .container {
+    position: relative;
     max-width: 1200px;
     margin: 0 auto 40px;
-    padding: 0 15px;
+    padding: 0 15px 15px;
+    strong {
+        display: block;
+    }
+}
+
+.text-center {
+    text-align: center;
 }
 
 .color-boxes-list,
-.color-bullets-list {
+.color-bullets-list,
+.radial-colors-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -20,7 +34,8 @@
     }
 }
 
-.color-bullets-list {
+.color-bullets-list,
+.radial-colors-list {
     li {
         width: 20px;
         height: 20px;
@@ -48,6 +63,39 @@
         position: absolute;
         background: white;
     }
+}
+
+.sky {
+    position: relative;
+    background: black;
+    height: 500px;
+    overflow: hidden;
+    .parent-star {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 100%;
+        top: 0;
+        left: 0;
+        background: transparent;
+        // box-shadow: 50% 50% 3px 0 white;
+    }
+}
+
+.stripes-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    li {
+        height: 20px;
+    }
+}
+
+.link,
+.link2 {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
 }
 
 // task 1
@@ -89,5 +137,381 @@ $colors: (
             width: random(3) + px;
             height: random(3) + px;
         }
+    }
+}
+
+@function makeBoxShadowStars($amount) {
+    $val: 0px 0px (random(5) + px) 0 white;
+    @for $i from 1 through $amount {
+        $val: #{$val}, (random(3000) + px) (random(500) + px) (random(5) + px) 0 white;
+    }
+    @return $val;
+}
+
+@mixin boxshadowstars($amount) {
+    box-shadow: makeBoxShadowStars($amount);
+}
+
+.parent-star {
+    @include boxshadowstars(1000);
+}
+
+// task 4
+
+$step: 1deg;
+
+@for $i from 1 through 360 {
+    .radial-colors-list {
+        li:nth-child(#{$i}) {
+            background: adjust-hue(#811, $step * $i);
+        }
+    }
+}
+
+// task 5
+@function makerandomrgba() {
+    $val: rgba(random(255), random(255), random(255), random(10) * 0.1);
+    @return $val;
+}
+@mixin randomrgba() {
+    background: makerandomrgba();
+}
+@for $i from 1 through 40 {
+    .stripes-list {
+        li:nth-child(#{$i}) {
+            @include randomrgba();
+        }
+    }
+}
+
+// task 6
+
+@mixin animateborder($color, $startstate /*visible/hidden*/, $height) {
+    color: $color;
+    text-decoration: none;
+    &:after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        height: $height;
+        transition: width .3s linear;
+        background: $color;
+    }
+    @if $startstate == visible {
+        &:after {
+            width: 100%;
+        }
+        &:hover:after {
+            width: 0;
+        }
+    } @else {
+        &:after {
+            width: 0;
+        }
+        &:hover:after {
+            width: 100%;
+        }
+    }
+}
+
+.link {
+    @include animateborder(green, visible, 1px);
+}
+
+.link2 {
+    @include animateborder(red, hidden, 1px);
+}
+
+/* ANIMATIONS */
+
+// flip
+
+.flip-holder {
+    margin: 0 auto;
+    perspective: 900px;
+    &:hover {
+        .flipper {
+            transform: rotateY(180deg);
+        }
+    }
+
+    .flipper {
+        transition: 0.6s;
+	    transform-style: preserve-3d;
+    }
+}
+
+.flip-holder,
+.front-flip,
+.back-flip {
+    width: 160px;
+    height: 240px;
+}
+
+.front-flip, .back-flip {
+	position: absolute;
+	top: 0;
+    left: 0;
+    -webkit-perspective: 0;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0,0,0);
+    visibility:visible;
+    backface-visibility: hidden;
+}
+
+.front-flip {
+    z-index: 2;
+    transform: rotate(0deg);
+    background: red;
+}
+
+.back-flip {
+    background: green;
+    transform: rotateY(180deg);
+}
+
+// cube
+
+.cube-holder {
+    width: 600px;
+    height: 600px;
+    margin: 0 auto;
+    position: relative;
+    border: 1px solid black;
+    .handler {
+        &:hover {
+            background: blue;
+        }
+        &.down {
+            &:hover {
+                ~ .cube {
+                    transform: perspective(900px) rotate3d(1, 0, 0, -90deg);
+                }
+            }
+        }
+        &.up {
+            &:hover {
+                ~ .cube {
+                    transform: perspective(900px) rotate3d(1, 0, 0, 90deg);
+                }
+            }
+        }
+        &.left {
+            &:hover {
+                ~ .cube {
+                    transform: perspective(900px) rotate3d(0, 1, 0, 90deg);
+                }
+            }
+        }
+        &.right {
+            &:hover {
+                ~ .cube {
+                    transform: perspective(900px) rotate3d(0, 1, 0, -90deg);
+                }
+            }
+        }
+    }
+    .cube {
+        transition: transform 1s linear;
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        transform-style: preserve-3d;
+        top: 50%;
+        left: 50%;
+        margin: -100px 0 0 -100px;
+        transform: perspective(1000px) rotate3d(1, 0, 0, 0deg);
+        .edge {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            padding: 15px;
+            opacity: .8;
+            background: white !important;
+            box-shadow: inset 0 0 40px 0 rgba(black, .4);
+            &.top {
+                bottom: 100%;
+                left: 0;
+                background: violet;
+                transform-origin: 0 100%;
+                transform: translate3d(0,0,100px) rotate3d(1,0,0,90deg);
+            }
+            &.front {
+                top: 0;
+                left: 0;
+                background: pink;
+                transform: translate3d(0,0,100px);
+            }
+            &.bottom {
+                top: 100%;
+                left: 0;
+                background: gray;
+                transform-origin: 0 0;
+                transform: translate3d(0,0,100px) rotate3d(1,0,0,-90deg);
+            }
+            &.left {
+                top: 0;
+                right: 100%;
+                background: indianred;
+                transform-origin: 100% 0;
+                transform: translate3d(0,0,100px) rotate3d(0,1,0,-90deg);
+            }
+            &.right {
+                top: 0;
+                left: 100%;
+                background: indigo;
+                transform-origin: 0 0;
+                transform: translate3d(0,0,100px) rotate3d(0,1,0,90deg);
+            }
+        }
+    }
+    .sub-cube {
+        width: 100px !important;
+        height: 100px !important;
+        margin: -50px 0 0 -50px;
+        .edge {
+            width: 100px;
+            height: 100px;
+            opacity: 1;
+            background: black !important;
+            box-shadow: 0 0 32px 0 red;
+            &.top {
+                transform: translate3d(0,0,50px) rotate3d(1,0,0,90deg);
+            }
+            &.front {
+                transform: translate3d(0,0,50px);
+            }
+            &.bottom {
+                transform: translate3d(0,0,50px) rotate3d(1,0,0,-90deg);
+            }
+            &.left {
+                transform: translate3d(0,0,50px) rotate3d(0,1,0,-90deg);
+            }
+            &.right {
+                transform: translate3d(0,0,50px) rotate3d(0,1,0,90deg);
+            }
+        }
+    }
+}
+
+// perspective
+
+.perspective-cards-group {
+    display: flex;
+    justify-content: center;
+    perspective: 900px;
+    perspective-origin: 50% 50%;
+}
+
+.perspective-card {
+    transition: transform .3s linear;
+    width: 160px;
+    transform-style: preserve-3d;
+    transform: rotate3d(0, 1, 0, 45deg);
+    &:hover {
+        transform: rotate3d(0, 1, 0, 0);
+        .visual {
+            img {
+                opacity: 1;
+            }
+        }
+        .description {
+            transform: translate3d(0, -50px, 0);
+        }
+    }
+
+    .visual,
+    .description {
+        -webkit-perspective: 0;
+        -webkit-backface-visibility: hidden;
+        -webkit-transform: translate3d(0,0,0);
+        visibility: visible;
+        backface-visibility: hidden;
+    }
+
+    .visual {
+        box-shadow: 0 0 5px 0 red;
+        background: white;
+        img {
+            transition: opacity .3s linear;
+            display: block;
+            width: 100%;
+            opacity: .8;
+        }
+    }
+
+    .description {
+        transition: transform .3s linear;
+        border: 1px solid black;
+        box-shadow: inset 0 0 10px rgba(black, .3);
+        padding: 10px;
+        margin: 0 20px;
+        background: white;
+        transform: translate3d(0, -50px, 20px);
+
+        p {
+            margin: 0;
+        }
+    }
+}
+
+// chaos
+
+@mixin randombg(){
+    background: rgba(random(255), random(255), random(255), random(10) * 0.1);
+}
+
+@mixin randomBallStyle(){
+    $randomSize: random(100) + px;
+    position: absolute;
+    border-radius: 100%;
+    top: random(1000) * 0.1 + %;
+    left: random(1000) * 0.1 + %;
+    width: $randomSize;
+    height: $randomSize;
+    background: rgba(random(255), random(255), random(255), random(10) * 0.1);
+}
+
+.chaos-box {
+    @include randombg();
+    position: relative;
+    height: 500px;
+    border: 1px solid black;
+    overflow: hidden;
+}
+
+@for $i from 1 through 100 {
+
+    @keyframes chaosMove-#{$i} {
+        0% {
+            top: random(100) + %;
+            left: random(100) + %;
+        }
+        20% {
+            top: random(100) + %;
+            left: random(100) + %;
+        }
+        40% {
+            top: random(100) + %;
+            left: random(100) + %;
+        }
+        60% {
+            top: random(100) + %;
+            left: random(100) + %;
+        }
+        80% {
+            top: random(100) + %;
+            left: random(100) + %;
+        }
+        100% {
+            top: random(100) + %;
+            left: random(100) + %;
+        }
+    }
+
+    .chaos-item:nth-child(#{$i}) {
+        @include randomBallStyle();
+        animation: chaosMove-#{$i} 30s linear infinite;
     }
 }
