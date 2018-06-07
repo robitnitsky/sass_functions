@@ -512,6 +512,6 @@ $step: 1deg;
 
     .chaos-item:nth-child(#{$i}) {
         @include randomBallStyle();
-        animation: chaosMove-#{$i} 30s linear infinite;
+        animation: chaosMove-#{$i} 100s linear infinite;
     }
 }
